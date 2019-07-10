@@ -6,7 +6,8 @@
 Monitor and synchronise Github and my laptop
 
 Usage:
-  repowatch show          
+  repowatch showremote
+  repowatch checklocal          
   repowatch (-h | --help)
   repowatch --version
 
@@ -23,6 +24,7 @@ import os
 import pprint
 import getpass
 import subprocess
+from docopt import docopt
 
 '''
 Repo Watch is a simple exercise to keep my local laptop 
@@ -40,10 +42,12 @@ def showrepos():
             print("#", repo.name)
             print("git clone %s" % repo.ssh_url)
 
-def main():
+def run():
     args = docopt(__doc__)
-    if args['show']:
+    if args['showremote']:
         showrepos()
+    if args['checklocal']:
+        monitor_all_ondisk(['/var/projects'])
 
 def monitor_all_ondisk(paths):
     """FOr all potential repo holding firs in paths, walk into each top level
@@ -114,5 +118,5 @@ def check_ondisk_status(repopath):
     
     
 if __name__ == '__main__':
-    #showrepos()
-    monitor_all_ondisk(['/var/projects'])
+    run()
+
