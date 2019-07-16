@@ -18,7 +18,8 @@ from docopt import docopt
 
 
 
-crap_matcher = ['*.*~',
+crap_matcher = ['*~',
+                '*.*~',
                 '*.pyc',
                 '#*#']
 ignore_dirs  = ['.git', '__pycache__']
@@ -32,8 +33,11 @@ def killfiles(kill_list,
     '''
     for fn in kill_list:
         if flag:
-            os.remove(fn)
-            print("[x] ", fn)
+            try:
+                os.remove(fn)
+                print("[x] ", fn)
+            except Exception as e:
+                print("[FAILED] %s because: %s" % (fn, e))
         else:
             print("[ ] ", fn)
 
