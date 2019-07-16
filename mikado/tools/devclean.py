@@ -57,6 +57,8 @@ def clean_tree(cwd=None,
             for pattern in crap_matcher:
                 if fnmatch(file, pattern):
                     kill_list.append(os.path.join(root, file))
+    #: dedupe
+    kill_list = list(set(kill_list))
     killfiles(kill_list, killflag)
 
 #entrypoint 
