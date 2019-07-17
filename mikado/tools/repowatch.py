@@ -8,6 +8,7 @@ Monitor and synchronise Github and my laptop
 Usage:
   repowatch showremote
   repowatch checklocal          
+  repowatch open <repo>
   repowatch (-h | --help)
   repowatch --version
 
@@ -43,8 +44,23 @@ def showrepos():
             print("#", repo.name)
             print("git clone %s" % repo.ssh_url)
 
+def open_repo(repopath):
+    """FInd the remote url for repopath and open in webbrowser """
+    url = do_subprocess(['git', '-C', repopath, 'config', 'remote.origin.url'])
+    print(url)
+    #expect:git@github.com:mikadosoftware/annotate.git
+    path = url.strip().split(":")[1].replace(".git","")
+    newurl = "https://github.com/" + path
+    print(newurl)
+    import webbrowser
+    webbrowser.open_new_tab(newurl)
+
 def run():
     args = docopt(__doc__)
+    if args['open']:
+        repopath = args['<repo>']
+        repopath = os.path.abspath(repopath)
+        open_repo(repopath)
     if args['showremote']:
         showrepos()
     if args['checklocal']:
