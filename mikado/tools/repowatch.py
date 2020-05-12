@@ -9,6 +9,7 @@ Usage:
   repowatch showremote
   repowatch checklocal          
   repowatch open <repo>
+  repowatch show <repo>
   repowatch (-h | --help)
   repowatch --version
 
@@ -30,7 +31,25 @@ from docopt import docopt
 '''
 Repo Watch is a simple exercise to keep my local laptop 
 synchronised with the ridiculous number of repos I keep creating 
+
+use `hub` to create a new repo as in ::
+
+  $ `repowatch` shows a repo exists but not in github
+  $ cd mikado-reporting
+  $ hub create mikadosoftware/mikado-reporting
+  $ git push 
+
 '''
+
+#{ } Add pypi status check to repo watch
+def check_pypi_status(package_name):
+    """Check on the simple pypi server for detaisl """
+    from pypi_simple import PyPISimple
+    client = PyPISimple()
+    packages = client.get_project_files('todoinator')
+    idx = len(packages)
+    print(packages[idx-1].version)
+    #need to work on this idx
 
 def showrepos():
     github_password = open('/var/secrets/github-token').read().strip()
@@ -44,23 +63,39 @@ def showrepos():
             print("#", repo.name)
             print("git clone %s" % repo.ssh_url)
 
+
+def get_origin_url(repopath):
+    """Return the url for this repo on disk """
+    try:
+        url = do_subprocess(['git', '-C', repopath, 'config', 'remote.origin.url'])
+        #expect:git@github.com:mikadosoftware/annotate.git
+        path = url.strip().split(":")[1].replace(".git","")
+        newurl = "https://github.com/" + path
+    except:
+        newurl = 'Not Found'
+    return newurl
+    
 def open_repo(repopath):
     """FInd the remote url for repopath and open in webbrowser """
-    url = do_subprocess(['git', '-C', repopath, 'config', 'remote.origin.url'])
-    print(url)
-    #expect:git@github.com:mikadosoftware/annotate.git
-    path = url.strip().split(":")[1].replace(".git","")
-    newurl = "https://github.com/" + path
-    print(newurl)
+    url = get_origin_url(repopath)
     import webbrowser
     webbrowser.open_new_tab(newurl)
 
+def show_repo(repopath):
+    """Tell me to avoid firefox weirdness """
+    url = get_origin_url(repopath)
+    print(url)
+    
 def run():
     args = docopt(__doc__)
     if args['open']:
         repopath = args['<repo>']
         repopath = os.path.abspath(repopath)
         open_repo(repopath)
+    if args['show']:
+        repopath = args['<repo>']
+        repopath = os.path.abspath(repopath)
+        show_repo(repopath)
     if args['showremote']:
         showrepos()
     if args['checklocal']:
