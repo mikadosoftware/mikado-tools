@@ -52,7 +52,7 @@ def check_pypi_status(package_name):
     #need to work on this idx
 
 def showrepos():
-    github_password = open('/var/secrets/usb/github.token').read().strip()
+    github_password = open('/home/pbrian/secrets/github.token.mini01').read().strip()
     
     g = Github(github_password)
 
