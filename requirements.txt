@@ -6,7 +6,7 @@ charset-normalizer==2.1.1
 docopt==0.6.2
 frozenlist==1.4.1
 github==1.2.7
-idna==3.6
+idna==3.7
 multidict==6.0.5
 typing_extensions==4.10.0
 yarl==1.9.4
