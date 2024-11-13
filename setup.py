@@ -14,5 +14,8 @@ setup(
      author='author',
      packages=find_packages(exclude=('tests')),
      #Make any (python/bash) scripts found here executable in PATH
-     scripts=glob.glob('bin/*')
+     scripts=glob.glob('bin/*'),
+     install_requires = [
+        line.strip() for line in open('requirements.txt')
+     ],
 )
