@@ -6,17 +6,19 @@
 Monitor and synchronise Github and my laptop
 
 Usage:
-  repowatch showremote
-  repowatch checklocal [--projectpath=~/projects]   
-  repowatch open <repo>
-  repowatch show <repo>
+  repowatch showremote   TBD  
+  repowatch checklocal   [--projectpath=~/projects]   
+  repowatch open <repo>  TBD
+  repowatch show <repo>  TBD
   repowatch (-h | --help)
   repowatch --version
 
-Options:
   -h --help     Show this screen.
   --version     Show version.
-  
+ 
+Longer Help
+
+checklocal will walk each dir under `projectpath` and report on `git status`
 
 """
 
@@ -24,6 +26,7 @@ from github import Github
 import time
 import os
 import pprint
+
 import getpass
 import subprocess
 from docopt import docopt
