@@ -7,7 +7,7 @@ Monitor and synchronise Github and my laptop
 
 Usage:
   repowatch showremote
-  repowatch checklocal          
+  repowatch checklocal [--projectpath=~/projects]   
   repowatch open <repo>
   repowatch show <repo>
   repowatch (-h | --help)
@@ -85,21 +85,6 @@ def show_repo(repopath):
     """Tell me to avoid firefox weirdness """
     url = get_origin_url(repopath)
     print(url)
-    
-def run():
-    args = docopt(__doc__)
-    if args['open']:
-        repopath = args['<repo>']
-        repopath = os.path.abspath(repopath)
-        open_repo(repopath)
-    if args['show']:
-        repopath = args['<repo>']
-        repopath = os.path.abspath(repopath)
-        show_repo(repopath)
-    if args['showremote']:
-        showrepos()
-    if args['checklocal']:
-        monitor_all_ondisk(['/var/projects'])
 
 def monitor_all_ondisk(paths):
     """FOr all potential repo holding firs in paths, walk into each top level
@@ -138,19 +123,18 @@ def check_ondisk_status(repopath):
     
     output = do_subprocess(['git', '-C', repopath, 'status'])
     
-    
     if 'fatal: not a git repository' in output:
         isGitRepo = False
     if 'nothing to commit, working tree clean' in output:
         isDirtyWorkspace = False
     else:
         isDirtyWorkspace = True
-    if '''Your branch is up to date with 'origin/master'.''' in output:
+    if '''Your branch is up-to-date ''' in output:
         isOutOfSync = False
     else:
         isOutOfSync = True
         #this not quite right as could be on other brnach ...
-
+    
     if not isDirtyWorkspace and not isOutOfSync and isGitRepo:
         pass
     else:
@@ -167,8 +151,28 @@ def check_ondisk_status(repopath):
         print(s)
         
     
-    
+def run():
+    args = docopt(__doc__)
+    if args['open']:
+        repopath = args['<repo>']
+        repopath = os.path.abspath(repopath)
+        open_repo(repopath)
+    if args['show']:
+        repopath = args['<repo>']
+        repopath = os.path.abspath(repopath)
+        show_repo(repopath)
+    if args['showremote']:
+        showrepos()
+    if args['checklocal']:
+        givenpath = args['--projectpath']
+        from pathlib import Path
+        if not givenpath:
+            projectpaths = [Path.home() / 'projects']
+        else:
+            projectpaths = [givenpath,]
+        monitor_all_ondisk(projectpaths)    
     
 if __name__ == '__main__':
-    run()
+    paths = ['/home/pbrian/projects',]
+    monitor_all_ondisk(paths)
 
