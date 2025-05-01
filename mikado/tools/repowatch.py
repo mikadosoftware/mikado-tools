@@ -10,7 +10,7 @@ Usage:
   repowatch checklocal   [--projectpath=~/projects]   
   repowatch open <repo>  TBD
   repowatch show <repo>  TBD
-  repowatch docscapture <repo>
+  repowatch docscapture
   repowatch (-h | --help)
   repowatch --version
 
@@ -165,11 +165,25 @@ def doc_capture(repopath):
     if os.path.isdir(binpath):
         binfiles = os.listdir(binpath)
     report = f'Report on {os.path.basename(repopath)}\n'
-    with open(readmepath) as fo:
-        txt = fo.read()[:300]
-    report += txt + "\n\n"
+    if readmepath:
+        with open(readmepath) as fo:
+            txt = fo.read()[:300]
+        report += txt + "\n\n"
     report += f"/bin dir: {binfiles}"
     print(report)
+
+def get_repo_dirs(rootofprojects=None):
+    """Return list of patsh to each repo top level 
+    We absolytely assume ~/projects holds the repos... because
+    """
+    from pathlib import Path
+    if not rootofprojects:
+        rootofprojects = Path.home()/'projects'
+    
+    projectpaths = [os.path.join(rootofprojects,f) for f in
+                        os.listdir(rootofprojects) if 
+                        os.path.isdir(os.path.join(rootofprojects,f))]
+    return projectpaths
 
 def run():
     args = docopt(__doc__)
@@ -184,19 +198,13 @@ def run():
     if args['showremote']:
         showrepos()
     if args['docscapture']:
-        repopath = args['<repo>']
-        repopath = os.path.abspath(repopath)
-        doc_capture(repopath) 
+        #repopath = args['<repo>']
+        repopaths = get_repo_dirs()
+        for repopath in repopaths:
+            repopath = os.path.abspath(repopath)
+            doc_capture(repopath) 
     if args['checklocal']:
         givenpath = args['--projectpath']
-        from pathlib import Path
-        if not givenpath:
-            projectpaths = [Path.home() / 'projects']
-        else:
-            projectpaths = [givenpath,]
-        monitor_all_ondisk(projectpaths)    
-    
-if __name__ == '__main__':
-    paths = ['/home/pbrian/projects',]
-    monitor_all_ondisk(paths)
+        projectpaths = get_repo_dirs(givenpath)
+        monitor_all_ondisk(projectpaths)
 
