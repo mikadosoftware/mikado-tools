@@ -10,6 +10,7 @@ Usage:
   repowatch checklocal   [--projectpath=~/projects]   
   repowatch open <repo>  TBD
   repowatch show <repo>  TBD
+  repowatch docscapture <repo>
   repowatch (-h | --help)
   repowatch --version
 
@@ -153,7 +154,23 @@ def check_ondisk_status(repopath):
     
         print(s)
         
-    
+def doc_capture(repopath):
+    files = [os.path.join(repopath, f) for f in os.listdir(repopath)]
+    readmepath = None
+    binfiles = []
+    for file in files:
+        if os.path.basename(file).lower().startswith('readme'):
+            readmepath = file
+    binpath = os.path.join(repopath, "bin")
+    if os.path.isdir(binpath):
+        binfiles = os.listdir(binpath)
+    report = f'Report on {os.path.basename(repopath)}\n'
+    with open(readmepath) as fo:
+        txt = fo.read()[:300]
+    report += txt + "\n\n"
+    report += f"/bin dir: {binfiles}"
+    print(report)
+
 def run():
     args = docopt(__doc__)
     if args['open']:
@@ -166,6 +183,10 @@ def run():
         show_repo(repopath)
     if args['showremote']:
         showrepos()
+    if args['docscapture']:
+        repopath = args['<repo>']
+        repopath = os.path.abspath(repopath)
+        doc_capture(repopath) 
     if args['checklocal']:
         givenpath = args['--projectpath']
         from pathlib import Path
